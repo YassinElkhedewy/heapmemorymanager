@@ -28,4 +28,5 @@ void HmmFree(void *ptr)
       mergeblk(prevblk);
     }
   }
+  heapshrink();
 }

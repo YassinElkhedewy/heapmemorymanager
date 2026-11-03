@@ -233,6 +233,31 @@ blkheader_t *heapgrow(size_t needsize)
   return finalblk;
 }
 
+/* Gives the free tail of the heap back to the OS with sbrk, keeping one chunk. */
+void heapshrink(void)
+{
+  if (lastheapblk == NULL || !isfree(lastheapblk))
+  {
+    return;
+  }
+  size_t tailsize = getrealsize(lastheapblk);
+  if (tailsize < HEAPSHRINKTHRESHOLD)
+  {
+    return;
+  }
+  if ((unsigned char *)sbrk(0) != heapend)
+  {
+    return;
+  }
+  size_t releasesize = tailsize - HEAPGROWCHUNK;
+  unsigned char *oldbrk = (unsigned char *)sbrk(-(intptr_t)releasesize);
+  if (oldbrk == (unsigned char *)-1)
+  {
+    return;
+  }
+  setsize(lastheapblk, HEAPGROWCHUNK);
+  heapend = heapend - releasesize;
+}
 /* Merges blk (free, in the list) with the next block in memory if that one is free. */
 void mergeblk(blkheader_t *blk)
 {

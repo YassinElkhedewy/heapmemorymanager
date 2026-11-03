@@ -27,6 +27,7 @@ struct blkheader
 #define OVERHEADSIZE (offsetof(blkheader_t, sharedmem.data))
 #define MINDATASIZE 16
 #define HEAPGROWCHUNK (128 * 1024)
+#define HEAPSHRINKTHRESHOLD (2 * HEAPGROWCHUNK)
 
 static inline size_t getrealsize(blkheader_t *blk)
 {
@@ -61,4 +62,5 @@ blkheader_t *searchbestfit(size_t needsize);
 blkheader_t *heapgrow(size_t needsize);
 void splitblk(blkheader_t *blk, size_t needsize);
 void mergeblk(blkheader_t *blk);
+void heapshrink(void);
 #endif // HMMNEEDS_H
